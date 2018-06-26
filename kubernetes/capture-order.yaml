@@ -1,0 +1,40 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: capture-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: capture-app
+    spec:
+      containers:
+        - name: capture-order-container
+          image: ekregistry.azurecr.io/emrekenci/captureorderack:latest
+          ports:
+          - containerPort: 8080
+          imagePullPolicy: Always
+          env:
+           -  name:  "MONGOURL"
+              valueFrom:
+                secretKeyRef:
+                  name: kuberneteschallenge
+                  key: mongodb
+           -  name: "AMQPURL"
+              valueFrom:
+                secretKeyRef:
+                  name: kuberneteschallenge
+                  key: rabbitmq
+           -  name:  "TEAMNAME"
+              value: "team-emre"
+           -  name: "APPINSIGHTS_KEY"
+              valueFrom:
+                secretKeyRef:
+                  name: kuberneteschallenge
+                  key: appinsights
+           -  name: "CHALLENGEAPPINSIGHTS_KEY"
+              valueFrom:
+                secretKeyRef:
+                  name: kuberneteschallenge
+                  key: challengeappinsights
